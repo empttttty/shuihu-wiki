@@ -4,9 +4,10 @@
 用法：
     $PY scripts/check_links.py
 
-两条经验（HANDOFF §8）：
+三条经验（HANDOFF §8）：
   #13  必须先剥掉 `?query`——`../search.html?q=名字` 若不剥会被误报成 159 条断链（真实为 0）。
   #8   计数不要用 `grep -c`（按行计数，卡片 join 到一行会被骗），本脚本用 Python 统计。
+  #24  `/xxx` 是站点根绝对路径，按 SITE 解析而非页面父目录——404 页只能用绝对路径（见下）。
 
 除文件存在性外，还校验 `#anchor` 是否在目标页有对应 id/name，
 因为图鉴锚点（endings.html#catN / places.html#realN）是手工拼接的字符串，
@@ -57,7 +58,13 @@ def main() -> int:
             if not target:
                 dest = page  # 纯 #anchor，指向本页
             else:
-                dest = (page.parent / target.split("?")[0]).resolve()
+                # 以 / 开头的是站点根绝对路径（404.html 必须用它——CF 返回 404 页时
+                # 地址栏保留原 URL，相对路径会相对原路径解析而再次 404）
+                path = target.split("?")[0]
+                if path.startswith("/"):
+                    dest = (SITE / path.lstrip("/")).resolve()
+                else:
+                    dest = (page.parent / path).resolve()
                 if not dest.exists():
                     missing_file[rel].append(raw)
                     continue

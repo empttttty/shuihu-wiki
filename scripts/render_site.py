@@ -731,6 +731,33 @@ def render_search(chapters: list[dict]) -> None:
 
 # ---------------------------------------------------------------- 渲染：名场面事件库
 
+def render_notfound() -> None:
+    """404 页（design.md §5.18）。
+
+    Cloudflare Pages 在输出目录根发现 404.html 后，会用它响应未匹配的路径
+    并返回真正的 404 状态码——此前是「200 + 首页内容」的软 404。
+
+    页内链接一律写站点根绝对路径（rel="/"）：CF 返回本页时浏览器地址栏仍是
+    原 URL（如 /wiki/nonexistent），相对路径会相对原路径解析而再次 404。
+    """
+    body = """<section class="hero">
+  <span class="seal seal-lg">查<br>无</span>
+  <h1>此路不通</h1>
+  <p class="tagline">你要找的这一号，石碣上没有，聚义厅里也点不着名。</p>
+  <p class="stats">404 · 许是路径写错了，许是撞见了李鬼——冒名顶替是他的拿手戏，真身却查不着</p>
+  <p class="hero-links">
+    <a class="btn btn-ink" href="/index.html">回聚义厅</a>
+    <a class="btn" href="/heroes.html">一百单八将</a>
+    <a class="btn" href="/events.html">名场面</a>
+    <a class="btn" href="/search.html">全文搜索</a>
+  </p>
+</section>
+<p class="note">若你是顺着本站某条链接来的，那是条断线，烦请把它的来处记下。</p>
+"""
+    (SITE / "404.html").write_text(page_shell("此路不通", "/", body, wide=True),
+                                   encoding="utf-8")
+
+
 def parse_ch_range(ch: str) -> list[str]:
     """'003' → ['003']；'047-050' → ['047','048','049','050']"""
     if "-" in ch:
@@ -1084,11 +1111,12 @@ def main() -> None:
     render_people_extra(extras, appearances, events)
     render_place_wiki(places, place_ap, events)
     render_search(chapters_cn)
+    render_notfound()
     write_assets()
 
     n_pages = len(list(SITE.rglob("*.html")))
     print(f"渲染完成 → {SITE}")
-    print(f"  HTML 页面: {n_pages}（章节 {len(chapters_cn)}×2 + 词条 {len(heroes)}+{len(extras)}+{len(places)} + 事件 {len(events)} + 首页/图鉴/结局/地名/因果/长廊/搜索）")
+    print(f"  HTML 页面: {n_pages}（章节 {len(chapters_cn)}×2 + 词条 {len(heroes)}+{len(extras)}+{len(places)} + 事件 {len(events)} + 首页/图鉴/结局/地名/因果/长廊/搜索/404）")
     print(f"  有出场记录的人物: {len(appearances)}/{len(heroes) + len(extras)}")
     print(f"  结局数据: {len(ENDINGS)}/{len(heroes)} 条 · "
           + " · ".join(f"{c['id']}{END_COUNTS[c['id']]}" for c in END_CATS))
