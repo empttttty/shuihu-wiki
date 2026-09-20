@@ -130,7 +130,8 @@ shuihu-wiki/
 
 | 项 | 内容 |
 |---|---|
-| 仓库 | GitHub 公开仓库 `shuihu-wiki`（本机 `~/WorkBuddy/shuihu-wiki` 是主工作副本） |
+| **线上地址** | **https://shuihu-wiki.pages.dev**（2026-09-20 23:00 首次上线，全站验证通过） |
+| 仓库 | `https://github.com/empttttty/shuihu-wiki`（public）；remote `git@github.com:empttttty/shuihu-wiki.git`，SSH 免密（本机 `~/.ssh/id_ed25519`） |
 | 托管 | Cloudflare Pages，Git 集成，监听 `main` 分支 |
 | 关键配置 | Framework preset `None`；**Build command 留空**；Build output directory `site` |
 | 完整步骤/排查 | `DEPLOY.md` |
@@ -139,6 +140,8 @@ shuihu-wiki/
 
 1. **`site/` 是要提交的构建产物**——这是本项目唯一一处「生成物进仓库」的例外，为的是让 Cloudflare 不跑 Python（OpenCC 依赖在 CF 构建镜像里不可靠）。`site/` 仍然是生成物，**手改依旧会被下次重建覆盖**（坑 #6 不变）。
 2. **上线四步不可跳**：`render_site.py` → `check_links.py`（必须全 0）→ `git commit` → `git push`。CF 侧不做任何校验，push 出去就是线上，体检是唯一守门人。
-3. **中文路径是上线后第一号验证项**：词条页文件名是中文（`site/wiki/宋江.html`），侧内链接写作未编码的 `href="wiki/宋江.html"`。首次部署后必须实际点开一个中文词条页验证；若 CF Pages 不兼容非 ASCII 文件名，降级方案是把词条页改为拼音/编号 slug（见 `DEPLOY.md` 第 4 节）。
+3. **中文路径已验证通过（2026-09-20）**：词条页文件名是中文（`site/wiki/宋江.html`），站内链接写作未编码的 `href="wiki/宋江.html"`；CF Pages 走 URL 解码匹配，实测 `/wiki/宋江` 返回 200 且 title 与正文均正确——**不需要拼音 slug 降级方案**。（附带行为：CF 会把 `.html` 后缀 308 归一化到无后缀路径，站内链接多一跳，功能与相对路径解析均正常。）
 4. **`.workbuddy/`（AI 工作记忆）不入仓库**，已在 `.gitignore` 排除。
 5. **不要复用 md2mp 那个 Pages 项目**：它是 Direct Upload 类型，接不了 Git。
+6. **push 走 SSH，不走 gh**：本机 `~/.ssh/id_ed25519` 已加到 GitHub 账号，`git push` 免密；`gh` CLI 虽已装（v2.101.0）但**未登录，且不影响链路**。
+7. **待办：缺 `site/404.html` 导致软 404**：实测 CF 对未匹配路径返回 **200 + 首页内容**（`/wiki/nonexistent-xyz.html`、`/no-such-dir/no-such-page.html` 均如此）。补一个 404 页可让错误路径返回真正的 404 状态码；生成逻辑要写进 `render_site.py`（守「内容改上游」，别手写进 `site/`）。

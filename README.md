@@ -2,6 +2,8 @@
 
 > 让《水浒传》像代码一样：语法高亮、跳转、搜索、推理。
 
+**线上站点：<https://shuihu-wiki.pages.dev>**（Cloudflare Pages；GitHub 推送即自动部署，链路见 `DEPLOY.md`）
+
 ## 使用说明
 
 ```bash
