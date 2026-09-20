@@ -1,0 +1,13 @@
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# AI 工作台本地数据（含工作记忆，不入公开仓库）
+.workbuddy/
+
+# 本地预览/临时
+*.log
+.venv/

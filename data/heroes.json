@@ -1,0 +1,758 @@
+[
+ {
+  "star": "天魁星",
+  "nickname": "呼保义",
+  "name": "宋江",
+  "rank": 1,
+  "tier": "天罡"
+ },
+ {
+  "star": "天罡星",
+  "nickname": "玉麒麟",
+  "name": "卢俊义",
+  "rank": 2,
+  "tier": "天罡"
+ },
+ {
+  "star": "天机星",
+  "nickname": "智多星",
+  "name": "吴用",
+  "rank": 3,
+  "tier": "天罡"
+ },
+ {
+  "star": "天闲星",
+  "nickname": "入云龙",
+  "name": "公孙胜",
+  "rank": 4,
+  "tier": "天罡"
+ },
+ {
+  "star": "天勇星",
+  "nickname": "大刀",
+  "name": "关胜",
+  "rank": 5,
+  "tier": "天罡"
+ },
+ {
+  "star": "天雄星",
+  "nickname": "豹子头",
+  "name": "林冲",
+  "rank": 6,
+  "tier": "天罡"
+ },
+ {
+  "star": "天猛星",
+  "nickname": "霹雳火",
+  "name": "秦明",
+  "rank": 7,
+  "tier": "天罡"
+ },
+ {
+  "star": "天威星",
+  "nickname": "双鞭",
+  "name": "呼延灼",
+  "rank": 8,
+  "tier": "天罡"
+ },
+ {
+  "star": "天英星",
+  "nickname": "小李广",
+  "name": "花荣",
+  "rank": 9,
+  "tier": "天罡"
+ },
+ {
+  "star": "天贵星",
+  "nickname": "小旋风",
+  "name": "柴进",
+  "rank": 10,
+  "tier": "天罡"
+ },
+ {
+  "star": "天富星",
+  "nickname": "扑天雕",
+  "name": "李应",
+  "rank": 11,
+  "tier": "天罡"
+ },
+ {
+  "star": "天满星",
+  "nickname": "美髯公",
+  "name": "朱仝",
+  "rank": 12,
+  "tier": "天罡"
+ },
+ {
+  "star": "天孤星",
+  "nickname": "花和尚",
+  "name": "鲁智深",
+  "rank": 13,
+  "tier": "天罡"
+ },
+ {
+  "star": "天伤星",
+  "nickname": "行者",
+  "name": "武松",
+  "rank": 14,
+  "tier": "天罡"
+ },
+ {
+  "star": "天立星",
+  "nickname": "双鎗将",
+  "name": "董平",
+  "rank": 15,
+  "tier": "天罡"
+ },
+ {
+  "star": "天捷星",
+  "nickname": "没羽箭",
+  "name": "张清",
+  "rank": 16,
+  "tier": "天罡"
+ },
+ {
+  "star": "天暗星",
+  "nickname": "青面兽",
+  "name": "杨志",
+  "rank": 17,
+  "tier": "天罡"
+ },
+ {
+  "star": "天祐星",
+  "nickname": "金鎗手",
+  "name": "徐宁",
+  "rank": 18,
+  "tier": "天罡"
+ },
+ {
+  "star": "天空星",
+  "nickname": "急先锋",
+  "name": "索超",
+  "rank": 19,
+  "tier": "天罡"
+ },
+ {
+  "star": "天速星",
+  "nickname": "神行太保",
+  "name": "戴宗",
+  "rank": 20,
+  "tier": "天罡"
+ },
+ {
+  "star": "天异星",
+  "nickname": "赤发鬼",
+  "name": "刘唐",
+  "rank": 21,
+  "tier": "天罡"
+ },
+ {
+  "star": "天杀星",
+  "nickname": "黑旋风",
+  "name": "李逵",
+  "rank": 22,
+  "tier": "天罡"
+ },
+ {
+  "star": "天微星",
+  "nickname": "九纹龙",
+  "name": "史进",
+  "rank": 23,
+  "tier": "天罡"
+ },
+ {
+  "star": "天究星",
+  "nickname": "没遮拦",
+  "name": "穆弘",
+  "rank": 24,
+  "tier": "天罡"
+ },
+ {
+  "star": "天退星",
+  "nickname": "插翅虎",
+  "name": "雷横",
+  "rank": 25,
+  "tier": "天罡"
+ },
+ {
+  "star": "天寿星",
+  "nickname": "混江龙",
+  "name": "李俊",
+  "rank": 26,
+  "tier": "天罡"
+ },
+ {
+  "star": "天剑星",
+  "nickname": "立地太岁",
+  "name": "阮小二",
+  "rank": 27,
+  "tier": "天罡"
+ },
+ {
+  "star": "天平星",
+  "nickname": "船火儿",
+  "name": "张横",
+  "rank": 28,
+  "tier": "天罡"
+ },
+ {
+  "star": "天罪星",
+  "nickname": "短命二郎",
+  "name": "阮小五",
+  "rank": 29,
+  "tier": "天罡"
+ },
+ {
+  "star": "天损星",
+  "nickname": "浪里白跳",
+  "name": "张顺",
+  "rank": 30,
+  "tier": "天罡"
+ },
+ {
+  "star": "天败星",
+  "nickname": "活阎罗",
+  "name": "阮小七",
+  "rank": 31,
+  "tier": "天罡"
+ },
+ {
+  "star": "天牢星",
+  "nickname": "病关索",
+  "name": "杨雄",
+  "rank": 32,
+  "tier": "天罡"
+ },
+ {
+  "star": "天慧星",
+  "nickname": "拚命三郎",
+  "name": "石秀",
+  "rank": 33,
+  "tier": "天罡"
+ },
+ {
+  "star": "天暴星",
+  "nickname": "两头蛇",
+  "name": "解珍",
+  "rank": 34,
+  "tier": "天罡"
+ },
+ {
+  "star": "天哭星",
+  "nickname": "双尾蝎",
+  "name": "解宝",
+  "rank": 35,
+  "tier": "天罡"
+ },
+ {
+  "star": "天巧星",
+  "nickname": "浪子",
+  "name": "燕青",
+  "rank": 36,
+  "tier": "天罡"
+ },
+ {
+  "star": "地魁星",
+  "nickname": "神机军师",
+  "name": "朱武",
+  "rank": 37,
+  "tier": "地煞"
+ },
+ {
+  "star": "地煞星",
+  "nickname": "镇三山",
+  "name": "黄信",
+  "rank": 38,
+  "tier": "地煞"
+ },
+ {
+  "star": "地勇星",
+  "nickname": "病尉迟",
+  "name": "孙立",
+  "rank": 39,
+  "tier": "地煞"
+ },
+ {
+  "star": "地杰星",
+  "nickname": "丑郡马",
+  "name": "宣赞",
+  "rank": 40,
+  "tier": "地煞"
+ },
+ {
+  "star": "地雄星",
+  "nickname": "井木犴",
+  "name": "郝思文",
+  "rank": 41,
+  "tier": "地煞"
+ },
+ {
+  "star": "地威星",
+  "nickname": "百胜将",
+  "name": "韩滔",
+  "rank": 42,
+  "tier": "地煞"
+ },
+ {
+  "star": "地英星",
+  "nickname": "天目将",
+  "name": "彭玘",
+  "rank": 43,
+  "tier": "地煞"
+ },
+ {
+  "star": "地奇星",
+  "nickname": "圣水将",
+  "name": "单廷珪",
+  "rank": 44,
+  "tier": "地煞"
+ },
+ {
+  "star": "地猛星",
+  "nickname": "神火将",
+  "name": "魏定国",
+  "rank": 45,
+  "tier": "地煞"
+ },
+ {
+  "star": "地文星",
+  "nickname": "圣手书生",
+  "name": "萧让",
+  "rank": 46,
+  "tier": "地煞"
+ },
+ {
+  "star": "地正星",
+  "nickname": "铁面孔目",
+  "name": "裴宣",
+  "rank": 47,
+  "tier": "地煞"
+ },
+ {
+  "star": "地阔星",
+  "nickname": "摩云金翅",
+  "name": "欧鹏",
+  "rank": 48,
+  "tier": "地煞"
+ },
+ {
+  "star": "地阖星",
+  "nickname": "火眼狻猊",
+  "name": "邓飞",
+  "rank": 49,
+  "tier": "地煞"
+ },
+ {
+  "star": "地强星",
+  "nickname": "锦毛虎",
+  "name": "燕顺",
+  "rank": 50,
+  "tier": "地煞"
+ },
+ {
+  "star": "地暗星",
+  "nickname": "锦豹子",
+  "name": "杨林",
+  "rank": 51,
+  "tier": "地煞"
+ },
+ {
+  "star": "地轴星",
+  "nickname": "轰天雷",
+  "name": "凌振",
+  "rank": 52,
+  "tier": "地煞"
+ },
+ {
+  "star": "地会星",
+  "nickname": "神算子",
+  "name": "蒋敬",
+  "rank": 53,
+  "tier": "地煞"
+ },
+ {
+  "star": "地佐星",
+  "nickname": "小温侯",
+  "name": "吕方",
+  "rank": 54,
+  "tier": "地煞"
+ },
+ {
+  "star": "地祐星",
+  "nickname": "赛仁贵",
+  "name": "郭盛",
+  "rank": 55,
+  "tier": "地煞"
+ },
+ {
+  "star": "地灵星",
+  "nickname": "神医",
+  "name": "安道全",
+  "rank": 56,
+  "tier": "地煞"
+ },
+ {
+  "star": "地兽星",
+  "nickname": "紫髯伯",
+  "name": "皇甫端",
+  "rank": 57,
+  "tier": "地煞"
+ },
+ {
+  "star": "地微星",
+  "nickname": "矮脚虎",
+  "name": "王英",
+  "rank": 58,
+  "tier": "地煞"
+ },
+ {
+  "star": "地慧星",
+  "nickname": "一丈青",
+  "name": "扈三娘",
+  "rank": 59,
+  "tier": "地煞"
+ },
+ {
+  "star": "地暴星",
+  "nickname": "丧门神",
+  "name": "鲍旭",
+  "rank": 60,
+  "tier": "地煞"
+ },
+ {
+  "star": "地然星",
+  "nickname": "混世魔王",
+  "name": "樊瑞",
+  "rank": 61,
+  "tier": "地煞"
+ },
+ {
+  "star": "地猖星",
+  "nickname": "毛头星",
+  "name": "孔明",
+  "rank": 62,
+  "tier": "地煞"
+ },
+ {
+  "star": "地狂星",
+  "nickname": "独火星",
+  "name": "孔亮",
+  "rank": 63,
+  "tier": "地煞"
+ },
+ {
+  "star": "地飞星",
+  "nickname": "八臂那咤",
+  "name": "项充",
+  "rank": 64,
+  "tier": "地煞"
+ },
+ {
+  "star": "地走星",
+  "nickname": "飞天大圣",
+  "name": "李衮",
+  "rank": 65,
+  "tier": "地煞"
+ },
+ {
+  "star": "地巧星",
+  "nickname": "玉臂匠",
+  "name": "金大坚",
+  "rank": 66,
+  "tier": "地煞"
+ },
+ {
+  "star": "地明星",
+  "nickname": "铁笛仙",
+  "name": "马麟",
+  "rank": 67,
+  "tier": "地煞"
+ },
+ {
+  "star": "地进星",
+  "nickname": "出洞蛟",
+  "name": "童威",
+  "rank": 68,
+  "tier": "地煞"
+ },
+ {
+  "star": "地退星",
+  "nickname": "翻江蜃",
+  "name": "童猛",
+  "rank": 69,
+  "tier": "地煞"
+ },
+ {
+  "star": "地满星",
+  "nickname": "玉旛竿",
+  "name": "孟康",
+  "rank": 70,
+  "tier": "地煞"
+ },
+ {
+  "star": "地遂星",
+  "nickname": "通臂猿",
+  "name": "侯健",
+  "rank": 71,
+  "tier": "地煞"
+ },
+ {
+  "star": "地周星",
+  "nickname": "跳涧虎",
+  "name": "陈达",
+  "rank": 72,
+  "tier": "地煞"
+ },
+ {
+  "star": "地隐星",
+  "nickname": "白花蛇",
+  "name": "杨春",
+  "rank": 73,
+  "tier": "地煞"
+ },
+ {
+  "star": "地异星",
+  "nickname": "白面郎君",
+  "name": "郑天寿",
+  "rank": 74,
+  "tier": "地煞"
+ },
+ {
+  "star": "地理星",
+  "nickname": "九尾龟",
+  "name": "陶宗旺",
+  "rank": 75,
+  "tier": "地煞"
+ },
+ {
+  "star": "地俊星",
+  "nickname": "铁扇子",
+  "name": "宋清",
+  "rank": 76,
+  "tier": "地煞"
+ },
+ {
+  "star": "地乐星",
+  "nickname": "铁叫子",
+  "name": "乐和",
+  "rank": 77,
+  "tier": "地煞"
+ },
+ {
+  "star": "地捷星",
+  "nickname": "花项虎",
+  "name": "龚旺",
+  "rank": 78,
+  "tier": "地煞"
+ },
+ {
+  "star": "地速星",
+  "nickname": "中箭虎",
+  "name": "丁得孙",
+  "rank": 79,
+  "tier": "地煞"
+ },
+ {
+  "star": "地镇星",
+  "nickname": "小遮拦",
+  "name": "穆春",
+  "rank": 80,
+  "tier": "地煞"
+ },
+ {
+  "star": "地嵇星",
+  "nickname": "操刀鬼",
+  "name": "曹正",
+  "rank": 81,
+  "tier": "地煞"
+ },
+ {
+  "star": "地魔星",
+  "nickname": "云里金刚",
+  "name": "宋万",
+  "rank": 82,
+  "tier": "地煞"
+ },
+ {
+  "star": "地妖星",
+  "nickname": "摸著天",
+  "name": "杜迁",
+  "rank": 83,
+  "tier": "地煞"
+ },
+ {
+  "star": "地幽星",
+  "nickname": "病大虫",
+  "name": "薛永",
+  "rank": 84,
+  "tier": "地煞"
+ },
+ {
+  "star": "地伏星",
+  "nickname": "金眼彪",
+  "name": "施恩",
+  "rank": 85,
+  "tier": "地煞"
+ },
+ {
+  "star": "地僻星",
+  "nickname": "打虎将",
+  "name": "李忠",
+  "rank": 86,
+  "tier": "地煞"
+ },
+ {
+  "star": "地空星",
+  "nickname": "小霸王",
+  "name": "周通",
+  "rank": 87,
+  "tier": "地煞"
+ },
+ {
+  "star": "地孤星",
+  "nickname": "金钱豹子",
+  "name": "汤隆",
+  "rank": 88,
+  "tier": "地煞"
+ },
+ {
+  "star": "地全星",
+  "nickname": "鬼脸儿",
+  "name": "杜兴",
+  "rank": 89,
+  "tier": "地煞"
+ },
+ {
+  "star": "地短星",
+  "nickname": "出林龙",
+  "name": "邹渊",
+  "rank": 90,
+  "tier": "地煞"
+ },
+ {
+  "star": "地角星",
+  "nickname": "独角龙",
+  "name": "邹润",
+  "rank": 91,
+  "tier": "地煞"
+ },
+ {
+  "star": "地囚星",
+  "nickname": "旱地忽律",
+  "name": "朱贵",
+  "rank": 92,
+  "tier": "地煞"
+ },
+ {
+  "star": "地藏星",
+  "nickname": "笑面虎",
+  "name": "朱富",
+  "rank": 93,
+  "tier": "地煞"
+ },
+ {
+  "star": "地平星",
+  "nickname": "铁臂膊",
+  "name": "蔡福",
+  "rank": 94,
+  "tier": "地煞"
+ },
+ {
+  "star": "地损星",
+  "nickname": "一枝花",
+  "name": "蔡庆",
+  "rank": 95,
+  "tier": "地煞"
+ },
+ {
+  "star": "地奴星",
+  "nickname": "催命判官",
+  "name": "李立",
+  "rank": 96,
+  "tier": "地煞"
+ },
+ {
+  "star": "地察星",
+  "nickname": "青眼虎",
+  "name": "李云",
+  "rank": 97,
+  "tier": "地煞"
+ },
+ {
+  "star": "地恶星",
+  "nickname": "没面目",
+  "name": "焦挺",
+  "rank": 98,
+  "tier": "地煞"
+ },
+ {
+  "star": "地丑星",
+  "nickname": "石将军",
+  "name": "石勇",
+  "rank": 99,
+  "tier": "地煞"
+ },
+ {
+  "star": "地数星",
+  "nickname": "小尉迟",
+  "name": "孙新",
+  "rank": 100,
+  "tier": "地煞"
+ },
+ {
+  "star": "地阴星",
+  "nickname": "母大虫",
+  "name": "顾大嫂",
+  "rank": 101,
+  "tier": "地煞"
+ },
+ {
+  "star": "地刑星",
+  "nickname": "菜园子",
+  "name": "张青",
+  "rank": 102,
+  "tier": "地煞"
+ },
+ {
+  "star": "地壮星",
+  "nickname": "母夜叉",
+  "name": "孙二娘",
+  "rank": 103,
+  "tier": "地煞"
+ },
+ {
+  "star": "地劣星",
+  "nickname": "活闪婆",
+  "name": "王定六",
+  "rank": 104,
+  "tier": "地煞"
+ },
+ {
+  "star": "地健星",
+  "nickname": "险道神",
+  "name": "郁保四",
+  "rank": 105,
+  "tier": "地煞"
+ },
+ {
+  "star": "地耗星",
+  "nickname": "白日鼠",
+  "name": "白胜",
+  "rank": 106,
+  "tier": "地煞"
+ },
+ {
+  "star": "地贼星",
+  "nickname": "鼓上蚤",
+  "name": "时迁",
+  "rank": 107,
+  "tier": "地煞"
+ },
+ {
+  "star": "地狗星",
+  "nickname": "金毛犬",
+  "name": "段景住",
+  "rank": 108,
+  "tier": "地煞"
+ }
+]
