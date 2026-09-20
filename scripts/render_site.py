@@ -10,12 +10,14 @@
   data/endings.json        108 将结局（手工维护，见文件内 _说明）
   data/places.json         地名（手工维护，实/存疑/虚 三分）
   data/causal.json         事件因果链（手工维护：chains 线索 + links 因果边）
+  data/relations.json      人物关系（手工维护：factions 山头阵营 + links 关系边）
 输出 site/:
   index.html               首页（回目列表 + 统计）
   heroes.html              108 将图鉴
   endings.html             108 将结局总览（按结局大类分组）
   places.html              地名图志（按虚实分组）
   causal.html              因果链总览（按线索展开 + 跨线索因果）
+  relations.html           人物关系总览（山头阵营 + 按类型分组的关系边 + 跨阵营连接）
   search.html              全文搜索
   chapters/*.html          简体阅读页（高亮 + Purple Numbers + 上下回导航）
   chapters_tw/*.html       繁体阅读页
@@ -28,6 +30,7 @@
 - 实体高亮单趟正则完成；「大刀/浪子/行者」等通用绰号只在「」引号内匹配，避免误伤正文
 - 实体分两级着色：人物=朱砂，地名=黛蓝（design.md §5.5），保证朱砂占比不失控
 - 因果链与线索分开：chains 是有序线索，links 才写「因为…所以」；渲染用**线型**区分（实线=因果，虚线=递进），不靠颜色
+- 人物关系同理分家：factions 是集合（山头/阵营，名单说清即可），links 才落到两个人头上；8 类关系一律不赋色
 - 繁体页用 OpenCC(s2t) 把别名表转成繁体再匹配，链接仍指向简体词条页
 - 全站除搜索页外零 JS，纯静态可直接部署
 """
@@ -64,6 +67,11 @@ CAUSAL_LINKS: list = []   # 因果边 [{from, to, kind, verb, note?}]
 CAUSAL_UP: dict = {}      # 事件 -> [指向它的边]（前因反查）
 CAUSAL_DOWN: dict = {}    # 事件 -> [它指向的边]（后果正查）
 CHAIN_OF: dict = {}       # 事件 -> [{chain, idx, total}]（可能同属多条线索的交汇点）
+REL_KINDS: list = []      # 关系类型 [{id, desc}]，顺序即展示顺序
+REL_FACTIONS: list = []   # 集合（山头/阵营）[{id, name, cls, ch, desc, members}]
+REL_LINKS: list = []      # 关系边 [{from, to, kind, verb, ch, note?}]
+REL_OF: dict = {}         # 人物 -> [(对方, 边)]（按人物聚合，供词条页使用）
+FACTION_OF: dict = {}     # 人物 -> [集合]（成员名单反查；108将未另归山头者默认属梁山泊）
 
 # ---------------------------------------------------------------- 数据读取
 
@@ -104,6 +112,50 @@ def load_causal() -> dict:
             CHAIN_OF.setdefault(name, []).append(
                 {"chain": ch, "idx": i + 1, "total": len(ch["events"])})
     return d
+
+
+def load_relations() -> dict:
+    """人物关系表（手工数据），并建好两个反查索引。
+
+    与因果链同构的两分法（design.md §5.19）：
+    factions=集合（山头/阵营），只在名单层面说「这伙人是一路的」；
+    links=关系边，才落到两个人头上。108 人拆成两两的边会生出近六千条
+    读者自己就能猜出来的连接——那是噪音，不是信息。
+    """
+    d = json.loads((DATA / "relations.json").read_text(encoding="utf-8"))
+    REL_KINDS.extend(d["kinds"])
+    REL_FACTIONS.extend([f for f in d["factions"] if not f["name"].startswith("_")])
+    REL_LINKS.extend(d["links"])
+    for f in REL_FACTIONS:
+        for m in f["members"]:
+            FACTION_OF.setdefault(m, []).append(f)
+    for link in d["links"]:
+        REL_OF.setdefault(link["from"], []).append((link["to"], link))
+        if link["from"] != link["to"]:
+            REL_OF.setdefault(link["to"], []).append((link["from"], link))
+    return d
+
+
+def factions_of(name: str) -> list[dict]:
+    """该人所属的集合。108 将若未另归山头，默认属「梁山泊」（不逐一列出的那条）。"""
+    fs = FACTION_OF.get(name)
+    if fs:
+        return fs
+    if name in HERO_INFO:
+        return [f for f in REL_FACTIONS if f["id"] == "liangshan"]
+    return []
+
+
+def is_cross_faction(link: dict) -> bool:
+    """跨阵营：两端各有一个「阵营」类归属，且两组归属无交集。
+
+    同集合内部的连接读者自己能猜出来，跨阵营的才是信息量最大的——
+    落到具体人头上的「谁要害谁、谁要打谁」（design.md §5.19）。
+    """
+    fa, fb = factions_of(link["from"]), factions_of(link["to"])
+    if not (any(f["cls"] == "阵营" for f in fa) and any(f["cls"] == "阵营" for f in fb)):
+        return False
+    return not ({f["id"] for f in fa} & {f["id"] for f in fb})
 
 
 def kind_cls(kind: str) -> str:
@@ -323,6 +375,7 @@ def page_shell(title: str, rel: str, body: str, wide: bool = False) -> str:
     <a href="{rel}places.html">地名</a>
     <a href="{rel}events.html">名场面</a>
     <a href="{rel}causal.html">因果链</a>
+    <a href="{rel}relations.html">关系</a>
     <a href="{rel}search.html">搜索</a>
   </nav>
 </header>
@@ -404,12 +457,14 @@ def render_home(chapters: list[dict], stats: dict) -> None:
   <span class="seal seal-lg">水<br>浒</span>
   <h1>水浒维基</h1>
   <p class="tagline">让《水浒传》像代码一样：语法高亮、跳转、搜索、推理</p>
-  <p class="stats">120 回 · {stats['chars']:,} 字 · 108 将 · 结局 8 类 · {stats['places']} 处地名（实/存疑/虚）· {stats['events']} 幕名场面 · {stats['causal']} 条因果边</p>
+  <p class="stats">120 回 · {stats['chars']:,} 字 · 108 将 · 结局 8 类 · {stats['places']} 处地名（实/存疑/虚）· {stats['events']} 幕名场面 · {stats['causal']} 条因果边 · {stats['relations']} 条人物关系</p>
   <p class="hero-links"><a class="btn btn-ink" href="chapters/001.html">开始阅读</a>
   <a class="btn" href="heroes.html">108将图鉴</a>
   <a class="btn" href="endings.html">108将结局</a>
   <a class="btn" href="places.html">地名图志</a>
   <a class="btn" href="events.html">名场面</a>
+  <a class="btn" href="causal.html">因果链</a>
+  <a class="btn" href="relations.html">人物关系</a>
   <a class="btn" href="search.html">全文搜索</a></p>
 </section>
 <h2 id="toc">回目</h2>
@@ -508,10 +563,12 @@ def render_people_extra(extras: list[dict], appearances: dict,
   {alias_row}
   <tr><th>首登场</th><td>{first_link}</td></tr>
   <tr><th>出场</th><td>{len(ch_ids)} 回 · 正文提及 {ap["mentions"]} 次（按别名自动统计，含误差）</td></tr>
+  {faction_row(name)}
 </table>
 {ev_section}
 <h2>出场回目</h2>
 <p class="chips">{chips}</p>
+{rel_block(name)}
 """
         (wiki_dir / f"{name}.html").write_text(
             page_shell(name, "../", body), encoding="utf-8")
@@ -563,11 +620,13 @@ def render_wiki(heroes: list[dict], appearances: dict, curated: dict,
   <tr><th>首登场</th><td>{first_link}</td></tr>
   <tr><th>出场</th><td>{len(ch_ids)} 回 · 正文提及 {ap["mentions"]} 次（按别名自动统计，含误差）</td></tr>
   {end_row}
+  {faction_row(h["name"])}
 </table>
 {end_section}
 <h2>出场回目</h2>
 <p class="chips">{chips}</p>
 {event_section}
+{rel_block(h["name"])}
 """
         (wiki_dir / f"{h['name']}.html").write_text(
             page_shell(h["name"], "../", body), encoding="utf-8")
@@ -903,6 +962,160 @@ def render_causal(events_data: dict) -> None:
         page_shell("事件因果链", "", body, wide=True), encoding="utf-8")
 
 
+# ---------------------------------------------------------------- 渲染：人物关系
+
+def faction_anchor(fid: str) -> str:
+    return f"f-{fid}"
+
+
+def rel_src(ch: str, rel: str = "../") -> str:
+    """出处回目（链接到该回首段）。"""
+    first = parse_ch_range(ch)[0]
+    return (f'<span class="rel-src"><a href="{rel}chapters/{first}.html">'
+            f'{ch_display(ch)}</a></span>')
+
+
+def rel_card(other: str, link: dict, name: str, rel: str = "../") -> str:
+    """词条页的关系卡：对方 + 方向 + 一句话说明 + 出处。"""
+    d = "我 → 对方" if link["from"] == name else "我 ← 对方"
+    note = (f'<span class="rel-note">{link["note"]}</span>'
+            if link.get("note") else "")
+    return (f'<div class="rel-item"><span class="rel-head">'
+            f'<span class="kind">{link["kind"]}</span>'
+            f'<a href="{rel}wiki/{other}.html"><b>{other}</b></a>'
+            f'<span class="rel-note">{d}</span></span>'
+            f'<span class="rel-verb">{link["verb"]}</span>{note}'
+            f'{rel_src(link["ch"], rel)}</div>')
+
+
+def rel_block(name: str, rel: str = "../") -> str:
+    """词条页「人物关系」区；无关系者整块不出现（宁缺勿滥）。"""
+    items = REL_OF.get(name)
+    if not items:
+        return ""
+    cards = "".join(rel_card(other, l, name, rel) for other, l in items)
+    return (f'<h2>人物关系</h2>\n'
+            f'<p class="note">共 {len(items)} 条 · '
+            f'<a href="{rel}relations.html">看全部关系 →</a></p>\n'
+            f'<div class="rel-list">{cards}</div>')
+
+
+def faction_row(name: str, rel: str = "../") -> str:
+    """信息表「所属」行：所属山头/阵营（108将未另归山头者默认梁山泊）。"""
+    fs = factions_of(name)
+    if not fs:
+        return ""
+    cells = "　".join(
+        f'<a href="{rel}relations.html#{faction_anchor(f["id"])}">{f["name"]}</a>'
+        for f in fs)
+    return f'  <tr><th>所属</th><td>{cells}</td></tr>\n'
+
+
+def render_relations() -> None:
+    """人物关系总览（design.md §5.19）。
+
+    四段结构：判断标准（8 类）→ 山头与阵营（集合）→ 关系边（按类型分组）
+    → 跨阵营的连接。集合与边分家是本页的骨架：名单能说清的绝不拆成边。
+    """
+    kind_counts = {k["id"]: sum(1 for l in REL_LINKS if l["kind"] == k["id"])
+                   for k in REL_KINDS}
+    people = {n for l in REL_LINKS for n in (l["from"], l["to"])}
+    for f in REL_FACTIONS:
+        people.update(f["members"])
+
+    legend = "".join(
+        f'<div class="kind-item"><b>{k["id"]}</b><span>{k["desc"]}</span>'
+        f'<span class="cnt">{kind_counts[k["id"]]} 条</span></div>'
+        for k in REL_KINDS)
+
+    # 集合：按 cls 分两块（山头 / 阵营），组内保持数据文件顺序
+    f_sections = []
+    for cls in ("山头", "阵营"):
+        group = [f for f in REL_FACTIONS if f["cls"] == cls]
+        if not group:
+            continue
+        cards = []
+        for f in group:
+            if f["members"]:
+                chips = "".join(
+                    f'<a class="chip" href="wiki/{m}.html">{m}</a>'
+                    for m in f["members"])
+                members_html = (f'<span class="faction-members">{chips}</span>'
+                                f'<span class="faction-m">{len(f["members"])} 人</span>')
+            else:
+                members_html = ('<span class="faction-m">一百单八将全体 · '
+                                '不逐一列出（凡未另归山头者皆属之）</span>')
+            cards.append(
+                f'<div class="faction-item" id="{faction_anchor(f["id"])}">'
+                f'<span class="faction-head"><b>{f["name"]}</b>'
+                f'<span class="cls">{f["cls"]}</span></span>'
+                f'<span class="faction-d">{f["desc"]}</span>'
+                f'{members_html}{rel_src(f["ch"], "")}</div>')
+        f_sections.append(
+            f'<div class="act-head" id="cls-{cls}"><small>'
+            f'{"上山前各自的落脚处 · 后并入梁山" if cls == "山头" else "梁山之外（与之内）的各方"}'
+            f'</small><h2>{cls} <span class="cnt">{len(group)} 伙</span></h2></div>\n'
+            f'<div class="faction-list">{"".join(cards)}</div>')
+
+    # 关系边：按类型分组，组内保持数据文件顺序（即按人物线聚拢）
+    l_sections = []
+    for k in REL_KINDS:
+        group = [l for l in REL_LINKS if l["kind"] == k["id"]]
+        if not group:
+            continue
+        cards = []
+        for l in group:
+            note = (f'<span class="rel-note">{l["note"]}</span>'
+                    if l.get("note") else "")
+            cards.append(
+                f'<div class="rel-item"><span class="rel-head">'
+                f'<span class="kind">{l["kind"]}</span>'
+                f'<a href="wiki/{l["from"]}.html"><b>{l["from"]}</b></a>'
+                f'<span class="rel-note">→</span>'
+                f'<a href="wiki/{l["to"]}.html"><b>{l["to"]}</b></a></span>'
+                f'<span class="rel-verb">{l["verb"]}</span>{note}'
+                f'{rel_src(l["ch"], "")}</div>')
+        l_sections.append(
+            f'<div class="act-head" id="kind-{k["id"]}"><small>{k["desc"]}</small>'
+            f'<h2>{k["id"]} <span class="cnt">{len(group)} 条</span></h2></div>\n'
+            f'<div class="rel-list">{"".join(cards)}</div>')
+
+    cross = [l for l in REL_LINKS if is_cross_faction(l)]
+    cross_items = "".join(
+        f'<div class="rel-cross">'
+        f'<a class="rel-node" href="wiki/{l["from"]}.html">{l["from"]}</a>'
+        f'<span class="rel-arrow"><span class="kind">{l["kind"]}</span>'
+        f'{l["verb"]}<i>▶</i></span>'
+        f'<a class="rel-node" href="wiki/{l["to"]}.html">{l["to"]}</a></div>'
+        for l in cross)
+
+    stat_chips = " ".join(
+        f'<a class="chip" href="#kind-{k["id"]}">{k["id"]} {kind_counts[k["id"]]}</a>'
+        for k in REL_KINDS)
+
+    body = f"""
+<header class="chead"><div class="cnum">结义师徒 · 主仆仇敌 · 一百单八人的人情网</div>
+<h1>人物关系</h1><div class="cmark">◆</div></header>
+<p class="note">{len(REL_FACTIONS)} 个山头与阵营 · {len(REL_LINKS)} 条关系边（8 类）· 涉及 {len(people)} 人 · 点人名进入词条</p>
+<p class="note end-stats">{stat_chips}</p>
+<div class="end-quote"><p>同山头是一张名单，落到两个人头上才叫关系——本站只把后者立为边。</p>
+<span class="end-m">—— 数据编纂原则（data/relations.json）</span></div>
+<h2>判断标准</h2>
+<div class="kind-legend">{legend}</div>
+<h2>山头与阵营</h2>
+<p class="note">只列名单，不拆成两两的边：同一伙人之间的联系，读者自己就能看出来</p>
+{"".join(f_sections)}
+<h2>关系</h2>
+<p class="note">按关系类型分组，每组内按人物线聚拢 · 箭头方向即「谁对谁」</p>
+{"".join(l_sections)}
+<h2>跨阵营的连接</h2>
+<p class="note">两端分属不同的阵营——单看某一方名单看不到的连接，共 {len(cross)} 条</p>
+{"".join(cross_items)}
+"""
+    (SITE / "relations.html").write_text(
+        page_shell("人物关系", "", body, wide=True), encoding="utf-8")
+
+
 def render_events(events_data: dict, chapters_by_id: dict) -> dict:
     """渲染 events.html 长廊 + events/<名>.html 详情页；返回含摘录信息的事件列表。"""
     events = events_data["events"]
@@ -1097,12 +1310,36 @@ def main() -> None:
     c_covered = {n for ch in CAUSAL_CHAINS for n in ch["events"]}
     if ev_set - c_covered:
         print(f"!! 未被任何线索收录的事件：{sorted(ev_set - c_covered)}")
-    events = render_events(events_data, chapters_by_id)
+    # 人物关系是手工数据，五项体检（design.md §5.19）：人名存在 → 类型合法
+    # → 无自环 → 无重复 from→to → 两人是否真在标注回目里出现过（专抓出处写错）
+    load_relations()
+    known = set(HERO_INFO) | set(EXTRA_INFO)
+    r_bad = sorted({n for l in REL_LINKS for n in (l["from"], l["to"])} - known)
+    r_mbad = sorted({m for f in REL_FACTIONS for m in f["members"]} - known)
+    r_kind = [l["kind"] for l in REL_LINKS
+              if l["kind"] not in {k["id"] for k in REL_KINDS}]
+    r_self = [l["from"] for l in REL_LINKS if l["from"] == l["to"]]
+    r_dup = [k for k, v in collections.Counter(
+        (l["from"], l["to"]) for l in REL_LINKS).items() if v > 1]
+    r_cls = [f["name"] for f in REL_FACTIONS if f["cls"] not in {"山头", "阵营"}]
+    r_ch = []
+    for l in REL_LINKS:
+        rng = set(parse_ch_range(l["ch"]))
+        for n in (l["from"], l["to"]):
+            if not (rng & set(appearances.get(n, {}).get("chapters", []))):
+                r_ch.append(f'{l["from"]}→{l["to"]}（{n} 不在{l["ch"]}）')
+    if r_bad or r_mbad or r_kind or r_self or r_dup or r_cls or r_ch:
+        print(f"!! 人物关系数据异常：边中人名不存在 {r_bad} · 成员人名不存在 {r_mbad} · "
+              f"非法类型 {r_kind} · 自环 {r_self} · 重复边 {r_dup} · "
+              f"非法集合类别 {r_cls} · 回目无交集 {r_ch}")
+    events =     render_events(events_data, chapters_by_id)
     render_causal(events_data)
+    render_relations()
 
     render_home(chapters_cn, {"chars": total_chars, "aliases": len(ENTRIES),
                               "events": len(events), "places": len(places),
-                              "causal": len(CAUSAL_LINKS)})
+                              "causal": len(CAUSAL_LINKS),
+                              "relations": len(REL_LINKS)})
     extras = load_extra()
     render_heroes(heroes, appearances, extras)
     render_endings(heroes)
@@ -1127,6 +1364,13 @@ def main() -> None:
           f"{len(CAUSAL_LINKS)} 条边（因果 {sum(1 for l in CAUSAL_LINKS if l['kind'] == '因果')}"
           f" · 递进 {sum(1 for l in CAUSAL_LINKS if l['kind'] == '递进')}）"
           f" · 跨线索 {sum(1 for l in CAUSAL_LINKS if not is_chain_neighbour(l['from'], l['to']))} 条")
+    rel_people = {n for l in REL_LINKS for n in (l["from"], l["to"])}
+    print(f"  人物关系: {len(REL_FACTIONS)} 个集合（山头 {sum(1 for f in REL_FACTIONS if f['cls'] == '山头')}"
+          f" · 阵营 {sum(1 for f in REL_FACTIONS if f['cls'] == '阵营')}）· "
+          f"{len(REL_LINKS)} 条边涉及 {len(rel_people)}/{len(HERO_INFO) + len(EXTRA_INFO)} 人"
+          f" · 跨阵营 {sum(1 for l in REL_LINKS if is_cross_faction(l))} 条"
+          + " · " + " ".join(f"{k['id']}{sum(1 for l in REL_LINKS if l['kind'] == k['id'])}"
+                             for k in REL_KINDS))
     print(f"  搜索索引: {(SITE / 'data' / 'search-index.json').stat().st_size / 1024:.0f} KB")
 
 

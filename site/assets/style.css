@@ -334,6 +334,7 @@ mark { background: var(--mark); padding: 0 1px; }
   font-size: var(--t-sm); color: var(--ink-2);
 }
 .kind-legend .kind-item b { color: var(--ink); flex: none; font-size: var(--t-ui); }
+.kind-legend .kind-item .cnt { font-size: var(--t-xs); color: var(--ink-3); margin-left: auto; }
 .kind-line { width: 56px; flex: none; height: 0; border-top: 2px solid var(--ink-3); }
 .kind-line.k-step { border-top-style: dashed; }
 .chain-desc { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.9; margin: 0 0 var(--s4); }
@@ -389,6 +390,47 @@ mark { background: var(--mark); padding: 0 1px; }
 }
 .cross-arrow i { font-style: normal; color: var(--ink-3); }
 
+/* ---- 5.19 人物关系（v1.7 新增；集合与边分家，类型不赋色） ---- */
+.faction-list {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--s3); margin: var(--s4) 0 var(--s5);
+}
+.faction-item {
+  display: flex; flex-direction: column;
+  background: var(--paper-hi); border: 1px solid var(--line); border-radius: 3px;
+  padding: var(--s3) var(--s4); transition: 150ms ease;
+}
+.faction-item:hover { border-color: var(--cinnabar); }
+.faction-item .faction-head { display: flex; align-items: baseline; gap: var(--s2); flex-wrap: wrap; }
+.faction-item .faction-head b { font-family: var(--font-title); font-size: var(--t-lg); }
+.faction-item .faction-head .cls { color: var(--gold); font-size: var(--t-xs); }
+.faction-d { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.8; margin-top: var(--s2); }
+.faction-members { margin-top: var(--s2); }
+.faction-members .chip { margin: 0 var(--s1) var(--s1) 0; }
+.faction-m { font-size: var(--t-xs); color: var(--ink-3); margin-top: var(--s2); }
+.rel-list { display: flex; flex-direction: column; gap: var(--s3); margin: var(--s4) 0 var(--s5); }
+.rel-item {
+  display: flex; flex-direction: column; gap: var(--s1);
+  background: var(--paper-hi); border: 1px solid var(--line); border-radius: 3px;
+  padding: var(--s3) var(--s4); color: var(--ink); transition: 150ms ease;
+}
+.rel-item:hover { border-color: var(--cinnabar); }
+.rel-head { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.rel-head b { font-family: var(--font-title); font-size: var(--t-ui); }
+.rel-verb { font-size: var(--t-sm); color: var(--ink-2); line-height: 1.7; }
+.rel-note { font-size: var(--t-xs); color: var(--ink-3); line-height: 1.7; }
+.rel-src { font-size: var(--t-xs); color: var(--gold); margin-top: var(--s1); }
+.rel-cross {
+  display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap;
+  padding: var(--s3) 0; border-bottom: 1px dashed var(--line);
+}
+.rel-cross .rel-node { font-family: var(--font-title); font-size: var(--t-ui); color: var(--dai); }
+.rel-cross .rel-arrow {
+  display: flex; align-items: center; gap: var(--s2);
+  font-size: var(--t-sm); color: var(--ink-2);
+}
+.rel-cross .rel-arrow i { font-style: normal; color: var(--ink-3); }
+
 /* ---- 5.11 Footer ---- */
 footer {
   background: var(--ink-bg); border-top: 2px solid var(--cinnabar);
@@ -418,6 +460,7 @@ footer a:hover { color: #fff; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .end-list { grid-template-columns: 1fr; }
   .place-list { grid-template-columns: 1fr; }
+  .faction-list { grid-template-columns: 1fr; }
   .causal { grid-template-columns: 1fr; }
   .chain { padding-left: var(--s3); }
 }
