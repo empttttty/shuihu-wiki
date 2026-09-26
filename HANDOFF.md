@@ -22,6 +22,7 @@
 | 部署 | **已做成 GitHub → Cloudflare Pages 自动部署**：`site/` 产物随仓库提交，CF 侧构建命令留空、输出目录 `site`。完整步骤见 `DEPLOY.md` |
 | 功能优先级 | 108将图鉴 → 名场面事件库 → **人物关系图（下一个）**；行踪地图降级远期 |
 | 视觉 | `design.md`「宋版书 × 数字刻本」是唯一标准；样式唯一源 `scripts/assets/style.css` |
+| 提交安全 | **pre-commit 钩子强制安全审计**：`scripts/security_scan.py --staged` 扫暂存区（密钥/邮箱/手机号/IP/本机路径/敏感文件名 + 提交邮箱必须 noreply），命中即拒绝提交。钩子本体在 `.githooks/`，新机器 clone 后须执行一次 `git config core.hooksPath .githooks`；误报改脚本里的 `ALLOW` 放行，禁删检测规则 |
 
 ## 3. 已完成（全部当天完成）
 

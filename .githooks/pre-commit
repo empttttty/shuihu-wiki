@@ -1,0 +1,12 @@
+#!/bin/sh
+# 提交前安全审计（项目硬规则，MEMORY.md 第 12 条）：
+# 扫描暂存区新增内容，命中密钥/邮箱/本机路径等敏感信息即拒绝提交。
+# 新机器 clone 后需执行一次：git config core.hooksPath .githooks
+
+if [ -x "$HOME/.workbuddy/binaries/python/envs/default/bin/python" ]; then
+  PY="$HOME/.workbuddy/binaries/python/envs/default/bin/python"
+else
+  PY="$(command -v python3)"
+fi
+
+exec "$PY" "$(dirname "$0")/../scripts/security_scan.py" --staged
