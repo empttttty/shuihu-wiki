@@ -431,6 +431,28 @@ mark { background: var(--mark); padding: 0 1px; }
 }
 .rel-cross .rel-arrow i { font-style: normal; color: var(--ink-3); }
 
+/* ---- 5.20 人物关系图（v1.8 新增；构建期静态 SVG，零 JS） ---- */
+.rel-graph-box { margin: var(--s4) 0 var(--s5); text-align: center; }
+.rel-graph { max-width: 100%; height: auto; }
+.rel-graph text { font-family: var(--font-song); }
+.rel-graph .ego-dot { fill: var(--cinnabar); }
+.rel-graph .ego-name {
+  fill: var(--cinnabar); font-family: var(--font-title); font-weight: 700; font-size: 15px;
+  paint-order: stroke; stroke: var(--paper); stroke-width: 4px; stroke-linejoin: round;
+}
+.rel-graph .peer-dot { fill: var(--paper-hi); stroke: var(--ink-2); stroke-width: 1.5; transition: 150ms ease; }
+.rel-graph a:hover .peer-dot { fill: var(--cinnabar); stroke: var(--cinnabar); }
+.rel-graph .peer-name { fill: var(--ink); font-size: 14px; transition: 150ms ease; }
+.rel-graph a:hover .peer-name { fill: var(--cinnabar); }
+.rel-graph .peer-cnt { fill: var(--ink-3); font-size: 11px; }
+.rel-graph .edge { stroke: var(--ink-3); stroke-width: 1; }
+.rel-graph .edge-arrow { fill: var(--ink-3); }
+.rel-graph .edge-kind {
+  fill: var(--ink-2); font-size: 12px;
+  paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-linejoin: round;
+}
+.rel-ocean .edge { stroke: var(--ink-3); stroke-width: 1; opacity: .5; }
+
 /* ---- 5.11 Footer ---- */
 footer {
   background: var(--ink-bg); border-top: 2px solid var(--cinnabar);

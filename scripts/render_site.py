@@ -37,6 +37,7 @@
 import collections
 import html
 import json
+import math
 import re
 import shutil
 from pathlib import Path
@@ -968,6 +969,124 @@ def faction_anchor(fid: str) -> str:
     return f"f-{fid}"
 
 
+# ---- 关系图（design.md §5.20：构建期静态 SVG，零 JS） ----
+
+def _polar(r: float, deg: float) -> tuple:
+    rad = math.radians(deg)
+    return r * math.cos(rad), r * math.sin(rad)
+
+
+def _arrow_tip(tx: float, ty: float, ux: float, uy: float) -> str:
+    """方向箭头小三角：顶点 (tx,ty)，朝单位向量 (ux,uy) 方向指。
+    不用 SVG <marker>——marker 颜色不可控，Python 直接算三个顶点。"""
+    length, width = 8, 6
+    bx, by = tx - ux * length, ty - uy * length      # 底边中点
+    px, py = -uy, ux                                  # 垂直方向
+    p1 = f"{bx + px * width / 2:.1f},{by + py * width / 2:.1f}"
+    p2 = f"{bx - px * width / 2:.1f},{by - py * width / 2:.1f}"
+    return f'<polygon class="edge-arrow" points="{tx:.1f},{ty:.1f} {p1} {p2}"/>'
+
+
+def _peer_label(cx: float, cy: float, x: float, y: float, r: float,
+                offset: float = 14) -> tuple:
+    """圆周外沿的标签坐标与对齐：随方位切换 start/middle/end，避免超出画布。"""
+    cos = x / r
+    anchor = "start" if cos > 0.35 else ("end" if cos < -0.35 else "middle")
+    lx = cx + x * (r + offset) / r
+    ly = cy + y * (r + offset) / r
+    return lx, ly, anchor
+
+
+def rel_graph_svg(name: str, items: list) -> str:
+    """词条页 ego 图（§5.20）：本人居中，一跳关系人按 8 类序放射排布。
+
+    零 JS：节点 <a> 跳词条、<title> 悬浮提示（类型 · verb · 出处）。
+    verb 全文不进图——图是索引，下方 .rel-list 文字卡才是详情。
+    """
+    n = len(items)
+    order = {k["id"]: i for i, k in enumerate(REL_KINDS)}
+    items = sorted(items, key=lambda t: order.get(t[1]["kind"], 99))
+    R = max(130, math.ceil(n * 64 / (2 * math.pi)))   # 每节点 ≥64px 弧长
+    # 矩形画布：横向边距须容纳最长人名（≈15px/字）+ 标签外移量，防 end-anchor 溢出
+    pad_x = max(len(o) for o, _ in items) * 15 + 24
+    pad_y = 34
+    w, h = 2 * (R + pad_x), 2 * (R + pad_y)
+    cx, cy = R + pad_x, R + pad_y
+
+    edges, nodes = [], []
+    for i, (other, link) in enumerate(items):
+        deg = -90 + i * 360 / n
+        x, y = _polar(R, deg)
+        px_, py_ = cx + x, cy + y
+        edges.append(
+            f'<line class="edge" x1="{cx}" y1="{cy}" x2="{px_:.1f}" y2="{py_:.1f}"/>')
+        ux, uy = x / R, y / R
+        if link["from"] == name:      # 我 → 对方：箭头向外（近关系人）
+            edges.append(_arrow_tip(px_ - ux * 10, py_ - uy * 10, ux, uy))
+        else:                         # 对方 → 我：箭头向心（近中心）
+            edges.append(_arrow_tip(cx + ux * 12, cy + uy * 12, -ux, -uy))
+        kx, ky = cx + x * 0.62, cy + y * 0.62
+        edges.append(f'<text class="edge-kind" x="{kx:.1f}" y="{ky:.1f}" '
+                     f'text-anchor="middle" dominant-baseline="central">'
+                     f'{link["kind"]}</text>')
+        lx, ly, anchor = _peer_label(cx, cy, x, y, R)
+        tip = html.escape(f'{link["kind"]} · {link["verb"]}（{ch_display(link["ch"])}）')
+        nodes.append(
+            f'<a href="{other}.html"><title>{tip}</title>'
+            f'<circle class="peer-dot" cx="{px_:.1f}" cy="{py_:.1f}" r="3.5"/>'
+            f'<text class="peer-name" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" '
+            f'dominant-baseline="central">{other}</text></a>')
+    center = (f'<circle class="ego-dot" cx="{cx}" cy="{cy}" r="5"/>'
+              f'<text class="ego-name" x="{cx}" y="{cy + 20}" '
+              f'text-anchor="middle">{name}</text>')
+    return (f'<svg class="rel-graph" viewBox="0 0 {w} {h}" width="{w}" '
+            f'height="{h}" role="img" aria-label="{name}的人物关系图">'
+            + "".join(edges + nodes + [center]) + "</svg>")
+
+
+def rel_ocean_svg() -> str:
+    """总览页归海图（§5.20）：梁山泊居中，14 山头按始见回目顺时针环绕。
+
+    三条例外：梁山前史不进图（它就是梁山本身的前身）；阵营不进图（与
+    梁山不是归属关系，画进去就是编造）；links 个人边不进图（ego 图的事）。
+    """
+    hills = sorted((f for f in REL_FACTIONS
+                    if f["cls"] == "山头" and f["id"] != "liangshanqian"),
+                   key=lambda f: f["ch"])
+    n = len(hills)
+    R = 175
+    pad_x = max(len(f["name"]) for f in hills) * 15 + 34   # 最长集合名 + offset + 余量
+    pad_y = 45                                             # 两行标签（名字 + 人数）
+    w, h = 2 * (R + pad_x), 2 * (R + pad_y)
+    cx, cy = R + pad_x, R + pad_y
+    liangshan_anchor = faction_anchor("liangshan")
+
+    edges, nodes = [], []
+    for i, f in enumerate(hills):
+        deg = -90 + i * 360 / n
+        x, y = _polar(R, deg)
+        px_, py_ = cx + x, cy + y
+        edges.append(
+            f'<line class="edge" x1="{cx}" y1="{cy}" x2="{px_:.1f}" y2="{py_:.1f}"/>')
+        lx, ly, anchor = _peer_label(cx, cy, x, y, R, offset=24)
+        cnt = f'{len(f["members"])} 人'
+        tip = html.escape(f'{f["name"]} · {cnt} · 始见{ch_display(f["ch"])}')
+        nodes.append(
+            f'<a href="#{faction_anchor(f["id"])}"><title>{tip}</title>'
+            f'<circle class="peer-dot" cx="{px_:.1f}" cy="{py_:.1f}" r="3.5"/>'
+            f'<text class="peer-name" x="{lx:.1f}" y="{ly - 6:.1f}" '
+            f'text-anchor="{anchor}" dominant-baseline="central">{f["name"]}</text>'
+            f'<text class="peer-cnt" x="{lx:.1f}" y="{ly + 8:.1f}" '
+            f'text-anchor="{anchor}" dominant-baseline="central">{cnt}</text></a>')
+    center = (f'<a href="#{liangshan_anchor}">'
+              f'<circle class="ego-dot" cx="{cx}" cy="{cy}" r="5"/>'
+              f'<text class="ego-name" x="{cx}" y="{cy + 20}" '
+              f'text-anchor="middle">梁山泊</text></a>')
+    return (f'<svg class="rel-graph rel-ocean" viewBox="0 0 {w} {h}" '
+            f'width="{w}" height="{h}" role="img" aria-label="百川归海图">'
+            + "".join(edges + nodes + [center]) + "</svg>")
+
+
 def rel_src(ch: str, rel: str = "../") -> str:
     """出处回目（链接到该回首段）。"""
     first = parse_ch_range(ch)[0]
@@ -989,14 +1108,16 @@ def rel_card(other: str, link: dict, name: str, rel: str = "../") -> str:
 
 
 def rel_block(name: str, rel: str = "../") -> str:
-    """词条页「人物关系」区；无关系者整块不出现（宁缺勿滥）。"""
+    """词条页「人物关系」区；无关系者整块不出现（宁缺勿滥）。
+    v1.8：区顶加 ego 图（§5.20）——图是索引，下方文字卡才是详情。"""
     items = REL_OF.get(name)
     if not items:
         return ""
     cards = "".join(rel_card(other, l, name, rel) for other, l in items)
     return (f'<h2>人物关系</h2>\n'
-            f'<p class="note">共 {len(items)} 条 · '
+            f'<p class="note">共 {len(items)} 条 · 图中箭头方向即「谁对谁」，悬浮节点看详情 · '
             f'<a href="{rel}relations.html">看全部关系 →</a></p>\n'
+            f'<div class="rel-graph-box">{rel_graph_svg(name, items)}</div>\n'
             f'<div class="rel-list">{cards}</div>')
 
 
@@ -1104,6 +1225,9 @@ def render_relations() -> None:
 <div class="kind-legend">{legend}</div>
 <h2>山头与阵营</h2>
 <p class="note">只列名单，不拆成两两的边：同一伙人之间的联系，读者自己就能看出来</p>
+<div class="rel-graph-box">{rel_ocean_svg()}
+<p class="note">百川归海：14 个山头按始见回目顺时针排布，连线仅示「最终汇入梁山」<br>
+梁山前史即梁山前身、各阵营与梁山非归属关系，皆不入此图</p></div>
 {"".join(f_sections)}
 <h2>关系</h2>
 <p class="note">按关系类型分组，每组内按人物线聚拢 · 箭头方向即「谁对谁」</p>
