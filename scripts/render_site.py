@@ -356,7 +356,7 @@ def build_matcher(entries: list[dict], lang: str, rel: str, counts: dict | None)
 
 # ---------------------------------------------------------------- 页面骨架
 
-def page_shell(title: str, rel: str, body: str, wide: bool = False) -> str:
+def page_shell(title: str, rel: str, body: str, wide: bool = False, scripts: str = "") -> str:
     main_cls = "wide" if wide else ""
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
@@ -387,6 +387,7 @@ def page_shell(title: str, rel: str, body: str, wide: bool = False) -> str:
   底本：<a href="https://zh.wikisource.org/wiki/水滸傳_(120回本)">维基文库《水滸傳 (120回本)》</a>（公有领域）<br>
   本站由 AI 辅助构建 · 标注数据 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">CC BY-NC-SA 4.0</a> · 方法论致敬 <a href="https://github.com/baojie/shiji-kb">shiji-kb</a> · 项目源码 <a href="https://github.com/empttttty/shuihu-wiki">GitHub</a>
 </footer>
+{scripts}
 </body>
 </html>
 """
@@ -454,11 +455,13 @@ def render_home(chapters: list[dict], stats: dict) -> None:
         f'<a href="chapters/{ch["id"]}.html">{html.escape(ch["title"])}</a></li>'
         for ch in chapters)
     body = f"""
-<section class="hero">
+<section class="hero-night">
+  <canvas id="starfield" aria-hidden="true"></canvas>
   <span class="seal seal-lg">水<br>浒</span>
   <h1>水浒维基</h1>
   <p class="tagline">让《水浒传》像代码一样：语法高亮、跳转、搜索、推理</p>
-  <p class="stats">120 回 · {stats['chars']:,} 字 · 108 将 · 结局 8 类 · {stats['places']} 处地名（实/存疑/虚）· {stats['events']} 幕名场面 · {stats['causal']} 条因果边 · {stats['relations']} 条人物关系</p>
+  <p class="stats">忠义堂石碣受天文，梁山泊英雄排座次——天罡 36 · 地煞 72，皆在此夜空。<br>
+  120 回 · {stats['chars']:,} 字 · 108 将 · 结局 8 类 · {stats['places']} 处地名（实/存疑/虚）· {stats['events']} 幕名场面 · {stats['causal']} 条因果边 · {stats['relations']} 条人物关系</p>
   <p class="hero-links"><a class="btn btn-ink" href="chapters/001.html">开始阅读</a>
   <a class="btn" href="heroes.html">108将图鉴</a>
   <a class="btn" href="endings.html">108将结局</a>
@@ -467,13 +470,17 @@ def render_home(chapters: list[dict], stats: dict) -> None:
   <a class="btn" href="causal.html">因果链</a>
   <a class="btn" href="relations.html">人物关系</a>
   <a class="btn" href="search.html">全文搜索</a></p>
+  <span class="scroll-hint">向下读回目</span>
 </section>
 <h2 id="toc">回目</h2>
 <ol class="toc">
 {items}
 </ol>
 """
-    (SITE / "index.html").write_text(page_shell("首页", "", body, wide=True), encoding="utf-8")
+    (SITE / "index.html").write_text(
+        page_shell("首页", "", body, wide=True,
+                   scripts='<script type="module" src="assets/home.js"></script>'),
+        encoding="utf-8")
 
 
 def render_heroes(heroes: list[dict], appearances: dict, extras: list[dict]) -> None:
@@ -1355,6 +1362,10 @@ def write_assets() -> None:
     adir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src / "style.css", adir / "style.css")
     shutil.copy2(src / "search.js", adir / "search.js")
+    shutil.copy2(src / "home.js", adir / "home.js")
+    vdir = adir / "vendor"
+    vdir.mkdir(exist_ok=True)
+    shutil.copy2(src / "vendor" / "three.module.min.js", vdir / "three.module.min.js")
 
 # ---------------------------------------------------------------- 主流程
 

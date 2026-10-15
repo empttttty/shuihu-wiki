@@ -96,6 +96,64 @@ h2 { font-size: var(--t-h2); margin: var(--s6) 0 var(--s4); }
 .hero .stats { color: var(--ink-3); font-size: var(--t-sm); margin: 0 0 var(--s5); }
 .hero-links { display: flex; justify-content: center; gap: var(--s3); flex-wrap: wrap; }
 
+/* ---- 5.3b 首页夜景 hero（design.md 待补 §5.3b；全站唯一 WebGL 区块） ----
+   概念：第七十一回「忠义堂石碣受天文」——36 天罡（朱砂）+ 72 地煞（月白）
+   悬于梁山泊夜空，倒映水泊。canvas 由 home.js 驱动；WebGL 不可用时
+   此处保留夜色渐变兜底，内容永远可读。朱砂用量约束同 §5.5：仅主 CTA
+   与印章承载，星点属图形层不计入文字配色。 */
+.hero-night {
+  position: relative;
+  margin: calc(-1 * var(--s6)) calc(50% - 50vw) var(--s6);  /* 破出 main 全宽 */
+  min-height: 92vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: var(--s7) var(--s5) var(--s6);
+  overflow: hidden;
+  color: var(--ink-bg-hi);
+  background:
+    radial-gradient(120% 90% at 50% 0%, #241c14 0%, #16120d 55%, #0d0b09 100%);
+  border-bottom: 2px solid var(--cinnabar);
+}
+.hero-night canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+.hero-night > * { position: relative; z-index: 1; }
+.hero-night .seal-lg { box-shadow: 0 0 28px rgba(192, 58, 43, .45), inset 0 0 0 1.5px rgba(255, 247, 234, .7); }
+.hero-night h1 {
+  font-size: var(--t-hero); letter-spacing: 16px; text-indent: 16px;
+  margin: var(--s5) 0 var(--s3);
+  color: var(--ink-bg-hi);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+}
+.hero-night .tagline { color: #B8AE97; font-size: 17px; margin: 0 0 var(--s2); }
+.hero-night .stats { color: #8B8171; font-size: var(--t-sm); margin: 0 0 var(--s5); max-width: 40em; }
+.hero-night .btn {
+  color: var(--ink-bg-hi);
+  border-color: rgba(240, 234, 219, .35);
+  background: rgba(33, 29, 24, .55);
+  backdrop-filter: blur(4px);
+}
+.hero-night .btn:hover { background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA; }
+.hero-night .btn-ink {
+  background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA;
+}
+.hero-night .btn-ink:hover { background: var(--cinnabar-deep); border-color: var(--cinnabar-deep); }
+.hero-night .scroll-hint {
+  position: absolute; bottom: var(--s5); left: 50%; transform: translateX(-50%);
+  color: #6E6555; font-size: var(--t-xs); letter-spacing: 4px;
+  writing-mode: vertical-rl;
+}
+.hero-night .scroll-hint::after {
+  content: ""; display: block; width: 1px; height: 34px; margin: var(--s2) auto 0;
+  background: linear-gradient(#6E6555, transparent);
+}
+@media (max-width: 640px) {
+  .hero-night h1 { letter-spacing: 8px; text-indent: 8px; font-size: 40px; }
+  .hero-night { min-height: 86vh; }
+}
+
 /* ---- 5.8 按钮 ---- */
 .btn {
   display: inline-block; padding: var(--s2) var(--s5);
