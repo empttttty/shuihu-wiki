@@ -96,62 +96,125 @@ h2 { font-size: var(--t-h2); margin: var(--s6) 0 var(--s4); }
 .hero .stats { color: var(--ink-3); font-size: var(--t-sm); margin: 0 0 var(--s5); }
 .hero-links { display: flex; justify-content: center; gap: var(--s3); flex-wrap: wrap; }
 
-/* ---- 5.3b 首页夜景 hero（design.md 待补 §5.3b；全站唯一 WebGL 区块） ----
-   概念：第七十一回「忠义堂石碣受天文」——36 天罡（朱砂）+ 72 地煞（月白）
-   悬于梁山泊夜空，倒映水泊。canvas 由 home.js 驱动；WebGL 不可用时
-   此处保留夜色渐变兜底，内容永远可读。朱砂用量约束同 §5.5：仅主 CTA
-   与印章承载，星点属图形层不计入文字配色。 */
-.hero-night {
+/* ---- 5.21 首页「排座次」粒子长片（design.md §5.21；全站 WebGL 唯一例外） ----
+   一部滚动驱动的发布片：canvas sticky 占满视口，六幕 DOM 浮于其上；
+   粒子形态（墨→字→星→网→澜）由 home.js 驱动。无 WebGL / 减弱动态时
+   canvas 移除，夜色底 + 文字内容完整可读（内容即兜底）。 */
+#film {
   position: relative;
   margin: calc(-1 * var(--s6)) calc(50% - 50vw) var(--s6);  /* 破出 main 全宽 */
-  min-height: 92vh;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center;
-  padding: var(--s7) var(--s5) var(--s6);
-  overflow: hidden;
+  background: #0D0B09;
   color: var(--ink-bg-hi);
-  background:
-    radial-gradient(120% 90% at 50% 0%, #241c14 0%, #16120d 55%, #0d0b09 100%);
   border-bottom: 2px solid var(--cinnabar);
 }
-.hero-night canvas {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
+#film-canvas {
+  position: sticky; top: 0;
+  width: 100%; height: 100vh;
   display: block;
+  margin-bottom: -100vh;      /* 让后续幕内容浮上画布 */
+  transition: opacity .6s ease;
 }
-.hero-night > * { position: relative; z-index: 1; }
-.hero-night .seal-lg { box-shadow: 0 0 28px rgba(192, 58, 43, .45), inset 0 0 0 1.5px rgba(255, 247, 234, .7); }
-.hero-night h1 {
-  font-size: var(--t-hero); letter-spacing: 16px; text-indent: 16px;
+body.past-film #film-canvas { opacity: 0; }
+body.no-webgl #film { background:
+  radial-gradient(120% 90% at 50% 0%, #241C14 0%, #16120D 55%, #0D0B09 100%); }
+
+.act {
+  position: relative;
+  min-height: 160vh;
+}
+.act-inner {
+  position: sticky; top: 0;
+  height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: var(--s5);
+}
+
+.act h1 {
+  font-size: clamp(44px, 8vw, 88px);
+  letter-spacing: 20px; text-indent: 20px;
   margin: var(--s5) 0 var(--s3);
   color: var(--ink-bg-hi);
-  text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .7);
 }
-.hero-night .tagline { color: #B8AE97; font-size: 17px; margin: 0 0 var(--s2); }
-.hero-night .stats { color: #8B8171; font-size: var(--t-sm); margin: 0 0 var(--s5); max-width: 40em; }
-.hero-night .btn {
+.act .tagline { color: #B8AE97; font-size: 17px; margin: 0 0 var(--s2); }
+.act-hint {
+  margin-top: var(--s7);
+  color: #6E6555; font-size: var(--t-xs); letter-spacing: 6px;
+  animation: hint-breathe 2.6s ease-in-out infinite;
+}
+@keyframes hint-breathe { 50% { opacity: .35; transform: translateY(6px); } }
+
+.act-kicker {
+  font-family: var(--font-title); font-weight: 700;
+  font-size: clamp(64px, 12vw, 128px);
+  color: var(--cinnabar);
+  margin: 0 0 var(--s4);
+  text-shadow: 0 0 44px rgba(192, 58, 43, .5);
+}
+.act-big {
+  font-family: var(--font-title); font-weight: 700;
+  font-size: clamp(56px, 10vw, 110px);
+  letter-spacing: 6px;
+  margin: 0 0 var(--s3);
+  color: var(--ink-bg-hi);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, .7);
+}
+.act-big-dot { color: var(--cinnabar); margin: 0 var(--s3); }
+.act-sub {
+  color: #A79C85; font-size: var(--t-ui); line-height: 2.1;
+  margin: 0; max-width: 34em;
+}
+.act-title {
+  font-size: clamp(40px, 7vw, 72px);
+  letter-spacing: 14px; text-indent: 14px;
+  color: var(--ink-bg-hi);
+  margin: 0 0 var(--s6);
+}
+.act .seal-lg { box-shadow: 0 0 28px rgba(192, 58, 43, .45), inset 0 0 0 1.5px rgba(255, 247, 234, .7); }
+
+/* 幕内按钮（夜景变体，语义同 §5.8：朱砂只给主 CTA） */
+.act .hero-links { margin-top: var(--s4); }
+.act .btn {
   color: var(--ink-bg-hi);
   border-color: rgba(240, 234, 219, .35);
   background: rgba(33, 29, 24, .55);
   backdrop-filter: blur(4px);
 }
-.hero-night .btn:hover { background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA; }
-.hero-night .btn-ink {
-  background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA;
+.act .btn:hover { background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA; }
+.act .btn-ink { background: var(--cinnabar); border-color: var(--cinnabar); color: #FFF7EA; }
+.act .btn-ink:hover { background: var(--cinnabar-deep); border-color: var(--cinnabar-deep); }
+
+/* 幕进度点（右缘），当前幕点亮朱砂 */
+.film-progress {
+  position: sticky; top: 50vh; z-index: 2;
+  float: right;
+  margin-right: var(--s5);
+  transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: var(--s3);
+  height: 0; overflow: visible;
 }
-.hero-night .btn-ink:hover { background: var(--cinnabar-deep); border-color: var(--cinnabar-deep); }
-.hero-night .scroll-hint {
-  position: absolute; bottom: var(--s5); left: 50%; transform: translateX(-50%);
-  color: #6E6555; font-size: var(--t-xs); letter-spacing: 4px;
-  writing-mode: vertical-rl;
+.film-progress i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4A4238;
+  transition: 300ms ease;
 }
-.hero-night .scroll-hint::after {
-  content: ""; display: block; width: 1px; height: 34px; margin: var(--s2) auto 0;
-  background: linear-gradient(#6E6555, transparent);
+body[data-act="0"] .film-progress i:nth-child(1),
+body[data-act="1"] .film-progress i:nth-child(2),
+body[data-act="2"] .film-progress i:nth-child(3),
+body[data-act="3"] .film-progress i:nth-child(4),
+body[data-act="4"] .film-progress i:nth-child(5),
+body[data-act="5"] .film-progress i:nth-child(6) {
+  background: var(--cinnabar);
+  box-shadow: 0 0 10px rgba(192, 58, 43, .8);
+  transform: scale(1.5);
 }
+
 @media (max-width: 640px) {
-  .hero-night h1 { letter-spacing: 8px; text-indent: 8px; font-size: 40px; }
-  .hero-night { min-height: 86vh; }
+  .act h1 { letter-spacing: 10px; text-indent: 10px; }
+  .act { min-height: 130vh; }
+  .film-progress { display: none; }
 }
 
 /* ---- 5.8 按钮 ---- */

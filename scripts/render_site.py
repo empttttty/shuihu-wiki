@@ -454,24 +454,86 @@ def render_home(chapters: list[dict], stats: dict) -> None:
         f'<li{" class=no-num" if ch["id"] in ("序", "引首") else ""}>'
         f'<a href="chapters/{ch["id"]}.html">{html.escape(ch["title"])}</a></li>'
         for ch in chapters)
+
+    # ---- 首页长片数据（design.md §5.21）：粒子所见即真实标注数据 ----
+    heroes = json.loads((DATA / "heroes.json").read_text(encoding="utf-8"))
+    rel = json.loads((DATA / "relations.json").read_text(encoding="utf-8"))
+    extras = json.loads((DATA / "people_extra.json").read_text(encoding="utf-8"))["people"]
+    film_data = {
+        "tg": [h["name"] for h in heroes if h["tier"] == "天罡"],
+        "ds": [h["name"] for h in heroes if h["tier"] == "地煞"],
+        "others": [p["name"] for p in extras],
+        "factions": [{"name": f["name"], "members": f["members"]}
+                     for f in rel["factions"]],
+        "edges": [[l["from"], l["to"]] for l in rel["links"]],
+    }
+    film_json = json.dumps(film_data, ensure_ascii=False)
+
     body = f"""
-<section class="hero-night">
-  <canvas id="starfield" aria-hidden="true"></canvas>
-  <span class="seal seal-lg">水<br>浒</span>
-  <h1>水浒维基</h1>
-  <p class="tagline">让《水浒传》像代码一样：语法高亮、跳转、搜索、推理</p>
-  <p class="stats">忠义堂石碣受天文，梁山泊英雄排座次——天罡 36 · 地煞 72，皆在此夜空。<br>
-  120 回 · {stats['chars']:,} 字 · 108 将 · 结局 8 类 · {stats['places']} 处地名（实/存疑/虚）· {stats['events']} 幕名场面 · {stats['causal']} 条因果边 · {stats['relations']} 条人物关系</p>
-  <p class="hero-links"><a class="btn btn-ink" href="chapters/001.html">开始阅读</a>
-  <a class="btn" href="heroes.html">108将图鉴</a>
-  <a class="btn" href="endings.html">108将结局</a>
-  <a class="btn" href="places.html">地名图志</a>
-  <a class="btn" href="events.html">名场面</a>
-  <a class="btn" href="causal.html">因果链</a>
-  <a class="btn" href="relations.html">人物关系</a>
-  <a class="btn" href="search.html">全文搜索</a></p>
-  <span class="scroll-hint">向下读回目</span>
-</section>
+<div id="film">
+  <canvas id="film-canvas" aria-hidden="true"></canvas>
+  <script id="shihu-data" type="application/json">{film_json}</script>
+  <nav class="film-progress" aria-hidden="true">
+    <i></i><i></i><i></i><i></i><i></i><i></i>
+  </nav>
+
+  <section class="act act-ink">
+    <div class="act-inner">
+      <span class="seal seal-lg">水<br>浒</span>
+      <h1>水浒维基</h1>
+      <p class="tagline">让《水浒传》像代码一样：语法高亮、跳转、搜索、推理</p>
+      <p class="act-hint">向下滚动 · 看一座水泊如何聚成</p>
+    </div>
+  </section>
+
+  <section class="act act-text">
+    <div class="act-inner">
+      <p class="act-kicker">卷</p>
+      <p class="act-big">{stats['chars']:,}</p>
+      <p class="act-sub">字 · 一百二十回 · 繁简双版本</p>
+    </div>
+  </section>
+
+  <section class="act act-star">
+    <div class="act-inner">
+      <p class="act-kicker">星</p>
+      <p class="act-big">108</p>
+      <p class="act-sub">天罡三十六 · 地煞七十二<br>「忠义堂石碣受天文，梁山泊英雄排座次」——第七十一回</p>
+    </div>
+  </section>
+
+  <section class="act act-net">
+    <div class="act-inner">
+      <p class="act-kicker">网</p>
+      <p class="act-big">159<span class="act-big-dot">·</span>150</p>
+      <p class="act-sub">位人物 · 条真实关系边 · 21 个山头与阵营<br>每一颗朱砂点是一位好汉，每一条线都能在回目里找到出处</p>
+    </div>
+  </section>
+
+  <section class="act act-wave">
+    <div class="act-inner">
+      <p class="act-kicker">澜</p>
+      <p class="act-big">55<span class="act-big-dot">·</span>54</p>
+      <p class="act-sub">幕名场面 · 条因果边 · {stats['places']} 处地名（实/存疑/虚）<br>时序归时序，因果归因果，站里每条线都分得清</p>
+    </div>
+  </section>
+
+  <section class="act act-home">
+    <div class="act-inner">
+      <p class="act-kicker">归</p>
+      <h2 class="act-title">上梁山</h2>
+      <p class="hero-links"><a class="btn btn-ink" href="chapters/001.html">开始阅读</a>
+      <a class="btn" href="heroes.html">108将图鉴</a>
+      <a class="btn" href="endings.html">108将结局</a>
+      <a class="btn" href="places.html">地名图志</a>
+      <a class="btn" href="events.html">名场面</a>
+      <a class="btn" href="causal.html">因果链</a>
+      <a class="btn" href="relations.html">人物关系</a>
+      <a class="btn" href="search.html">全文搜索</a></p>
+    </div>
+  </section>
+</div>
+
 <h2 id="toc">回目</h2>
 <ol class="toc">
 {items}
